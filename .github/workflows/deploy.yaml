@@ -1,0 +1,25 @@
+name: Deploy to Kind with Vault
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Build Docker Image
+      run: |
+        docker build -t go-vault-app .
+
+    - name: Load to KIND
+      run: |
+        kind load docker-image go-vault-app
+
+    - name: Deploy to Kubernetes
+      run: |
+        kubectl apply -f k8s/deployment.yaml
+        kubectl apply -f k8s/service.yaml

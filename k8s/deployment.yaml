@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: go-vault-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: go-vault
+  template:
+    metadata:
+      labels:
+        app: go-vault
+      annotations:
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/role: "github-actions"
+        vault.hashicorp.com/secret-volume-path: "/vault/secrets"
+        vault.hashicorp.com/agent-inject-secret-POSTGRES_USER: "secret/data/ci-cd/postgresql"
+        vault.hashicorp.com/agent-inject-template-POSTGRES_USER: |
+          {{- with secret "secret/data/ci-cd/postgresql" -}}
+          {{ .Data.data.POSTGRES_USER }}
+          {{- end }}
+    spec:
+      containers:
+      - name: app
+        image: go-vault-app
+        ports:
+        - containerPort: 8080
