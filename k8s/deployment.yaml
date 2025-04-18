@@ -24,5 +24,6 @@ spec:
       containers:
       - name: app
         image: go-vault-app
+        imagePullPolicy: Never
         ports:
         - containerPort: 8080
